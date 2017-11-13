@@ -99,6 +99,18 @@ QString OSMTileSource::tileFileExtension() const
         return "jpg";
 }
 
+#define FIT_URL(url, scheme, host, path, query) \
+{ \
+    url.setScheme(scheme); \
+    url.setHost  ( host ); \
+    url.setPath  ( path ); \
+    \
+    if (!query.empty()) \
+    { \
+        url.setQueryItems(query); \
+    } \
+}
+
 //protected
 void OSMTileSource::fetchTile(quint32 x, quint32 y, quint8 z)
 {
@@ -115,9 +127,34 @@ void OSMTileSource::fetchTile(quint32 x, quint32 y, quint8 z)
     }
     else if (_tileType == TopoMapOSMTiles)
     {
-        url.setScheme("http");
-        url.setHost("tile.opentopomap.org");
-        url.setPath(QString("/%1/%2/%3.png").arg(QString::number(z),QString::number(x),QString::number(y)));
+        QString host   = QString("a.tile.thunderforest.com");
+        QString scheme = QString("https");
+        QString file   = QString("%1/%2/%3.png").arg(QString::number(z),QString::number(x),QString::number(y));
+        typedef QPair<QString, QString> QueryItem_t;
+        typedef QList<QueryItem_t> Query_t;
+
+        const QueryItem_t apikey("apikey", "def4ddae13e44bd79882ccc24cf486d9");
+
+        Query_t query;
+
+        query.append(apikey);
+
+        // FIT_URL(url, scheme, host, "/cycle/"          + file, query); // OpenCycleMap
+        // FIT_URL(url, scheme, host, "/transport/"      + file, query); // Transport
+        // FIT_URL(url, scheme, host, "/landscape/"      + file, query); // Landscape
+        // FIT_URL(url, scheme, host, "/outdoors/"       + file, query); // Outdoors
+        // FIT_URL(url, scheme, host, "/transport-dark/" + file, query); // Transport Dark
+        // FIT_URL(url, scheme, host, "/spinal-map/"     + file, query); // Spinal Map
+        // FIT_URL(url, scheme, host, "/pioneer/"        + file, query); // Pioneer
+        // FIT_URL(url, scheme, host, "/mobile-atlas/"   + file, query); // Mobile Atlas
+        // FIT_URL(url, scheme, host, "/neighbourhood/"  + file, query); // Neighbourhood
+
+        query.clear();
+        FIT_URL(url, "https", "a.tile.opentopomap.org", "/" + file, query);        // OpenTopoMap
+
+//         url.setScheme("http");
+//         url.setHost("tile.opentopomap.org");
+//         url.setPath(QString("/%1/%2/%3.png").arg(QString::number(z),QString::number(x),QString::number(y)));
     }
     else if (_tileType == MapQuestOSMTiles)
     {
