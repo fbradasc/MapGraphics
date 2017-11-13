@@ -30,13 +30,15 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setCentralWidget(view);
 
     //Setup some tile sources
-    QSharedPointer<OSMTileSource> osmTiles(new OSMTileSource(OSMTileSource::OSMTiles), &QObject::deleteLater);
-    QSharedPointer<OSMTileSource> aerialTiles(new OSMTileSource(OSMTileSource::MapQuestAerialTiles), &QObject::deleteLater);
-    QSharedPointer<GridTileSource> gridTiles(new GridTileSource(), &QObject::deleteLater);
+//    QSharedPointer<OSMTileSource> osmTiles(new OSMTileSource(OSMTileSource::OSMTiles), &QObject::deleteLater);
+    QSharedPointer<OSMTileSource> otmTiles(new OSMTileSource(OSMTileSource::TopoMapOSMTiles), &QObject::deleteLater);
+//    QSharedPointer<OSMTileSource> aerialTiles(new OSMTileSource(OSMTileSource::MapQuestAerialTiles), &QObject::deleteLater);
+//    QSharedPointer<GridTileSource> gridTiles(new GridTileSource(), &QObject::deleteLater);
     QSharedPointer<CompositeTileSource> composite(new CompositeTileSource(), &QObject::deleteLater);
-    composite->addSourceBottom(osmTiles);
-    composite->addSourceBottom(aerialTiles);
-    composite->addSourceTop(gridTiles);
+//    composite->addSourceBottom(osmTiles);
+    composite->addSourceBottom(otmTiles);
+//    composite->addSourceBottom(aerialTiles);
+//    composite->addSourceTop(gridTiles);
     view->setTileSource(composite);
 
     //Create a widget in the dock that lets us configure tile source layers
@@ -48,11 +50,11 @@ MainWindow::MainWindow(QWidget *parent) :
     this->ui->menuWindow->addAction(this->ui->dockWidget->toggleViewAction());
     this->ui->dockWidget->toggleViewAction()->setText("&Layers");
 
-    view->setZoomLevel(4);
+    view->setZoomLevel(0/*4*/);
     view->centerOn(-111.658752, 40.255456);
 
-    WeatherManager * weatherMan = new WeatherManager(scene, this);
-    Q_UNUSED(weatherMan)
+//    WeatherManager * weatherMan = new WeatherManager(scene, this);
+//    Q_UNUSED(weatherMan)
 }
 
 MainWindow::~MainWindow()

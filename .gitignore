@@ -1,1 +1,12 @@
 *.pro.user
+*.o
+*.so
+*.so.*
+moc_*
+Makefile
+ui_*.h
+*~
+.*~
+qrc_*.cpp
+TestApp
+.exvim.*

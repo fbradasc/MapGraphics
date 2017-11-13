@@ -17,7 +17,8 @@ public:
     {
         OSMTiles,
         MapQuestOSMTiles,
-        MapQuestAerialTiles
+        MapQuestAerialTiles,
+        TopoMapOSMTiles,
     };
 
 public:

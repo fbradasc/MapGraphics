@@ -81,6 +81,10 @@ QString OSMTileSource::name() const
         return "MapQuest Aerial Tiles";
         break;
 
+    case TopoMapOSMTiles:
+        return "OpenTopoMap Tiles";
+        break;
+
     default:
         return "Unknown Tiles";
         break;
@@ -89,7 +93,7 @@ QString OSMTileSource::name() const
 
 QString OSMTileSource::tileFileExtension() const
 {
-    if (_tileType == OSMTiles || _tileType == MapQuestOSMTiles)
+    if (_tileType == OSMTiles || _tileType == MapQuestOSMTiles || _tileType == TopoMapOSMTiles)
         return "png";
     else
         return "jpg";
@@ -100,26 +104,37 @@ void OSMTileSource::fetchTile(quint32 x, quint32 y, quint8 z)
 {
     MapGraphicsNetwork * network = MapGraphicsNetwork::getInstance();
 
-    QString host;
-    QString url;
+    QUrl url;
 
     //Figure out which server to request from based on our desired tile type
     if (_tileType == OSMTiles)
     {
-        host = "http://b.tile.openstreetmap.org";
-        url = "/%1/%2/%3.png";
+        url.setScheme("http");
+        url.setHost("tile.openstreetmap.org");
+        url.setPath(QString("/%1/%2/%3.png").arg(QString::number(z),QString::number(x),QString::number(y)));
+    }
+    else if (_tileType == TopoMapOSMTiles)
+    {
+        url.setScheme("http");
+        url.setHost("tile.opentopomap.org");
+        url.setPath(QString("/%1/%2/%3.png").arg(QString::number(z),QString::number(x),QString::number(y)));
     }
     else if (_tileType == MapQuestOSMTiles)
     {
-        host = "http://otile1.mqcdn.com";
-        url = "/tiles/1.0.0/osm/%1/%2/%3.jpg";
+return;
+        url.setScheme("http");
+        url.setHost("otile1.mqcdn.com");
+        url.setPath(QString("/tiles/1.0.0/osm/%1/%2/%3.jpg").arg(QString::number(z),QString::number(x),QString::number(y)));
     }
     else
     {
-        host = "http://otile1.mqcdn.com";
-        url = "/tiles/1.0.0/sat/%1/%2/%3.jpg";
+return;
+        url.setScheme("http");
+        url.setHost("otile1.mqcdn.com");
+        url.setPath(QString("/tiles/1.0.0/sat/%1/%2/%3.jpg").arg(QString::number(z),QString::number(x),QString::number(y)));
     }
 
+    // url.setPort(80);
 
     //Use the unique cacheID to see if this tile has already been requested
     const QString cacheID = this->createCacheID(x,y,z);
@@ -128,10 +143,8 @@ void OSMTileSource::fetchTile(quint32 x, quint32 y, quint8 z)
     _pendingRequests.insert(cacheID);
 
     //Build the request
-    const QString fetchURL = url.arg(QString::number(z),
-                                     QString::number(x),
-                                     QString::number(y));
-    QNetworkRequest request(QUrl(host + fetchURL));
+    QNetworkRequest request(url);
+    qDebug() << request.url().toString();
 
     //Send the request and setupd a signal to ensure we're notified when it finishes
     QNetworkReply * reply = network->get(request);
@@ -169,12 +182,15 @@ void OSMTileSource::handleNetworkRequestFinished()
 
     //get the cacheID
     const QString cacheID = _pendingReplies.take(reply);
+
     _pendingRequests.remove(cacheID);
 
     //If there was a network error, ignore the reply
     if (reply->error() != QNetworkReply::NoError)
     {
-        qDebug() << "Network Error:" << reply->errorString();
+        qDebug() << "ErrorNo: " << reply->error() << "for url: " << reply->url().toString();
+        qDebug() << "Request failed, " << reply->errorString();
+        qDebug() << "Headers:"<<  reply->rawHeaderList() << "content:" << reply->readAll();
         return;
     }
 

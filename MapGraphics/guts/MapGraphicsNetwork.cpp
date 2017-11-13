@@ -4,8 +4,10 @@
 #include <QNetworkRequest>
 #include <QThread>
 #include <QtDebug>
+#include <QList>
+#include <QNetworkProxy>
 
-const QByteArray DEFAULT_USER_AGENT = "MapGraphics";
+const QByteArray DEFAULT_USER_AGENT = "Map Graphics";
 
 //static
 QHash<QThread *, MapGraphicsNetwork *> MapGraphicsNetwork::_instances = QHash<QThread *, MapGraphicsNetwork*>();
@@ -29,8 +31,22 @@ MapGraphicsNetwork::~MapGraphicsNetwork()
 
 QNetworkReply *MapGraphicsNetwork::get(QNetworkRequest &request)
 {
-    request.setRawHeader("User-Agent",
-                         _userAgent);
+    //-----------------------------------------------------------------
+    QNetworkProxyQuery npq(request.url());
+    QList<QNetworkProxy> listOfProxies = QNetworkProxyFactory::systemProxyForQuery(npq);
+
+    if (listOfProxies.count() != 0)
+    {
+        if (listOfProxies.at(0).type() != QNetworkProxy::NoProxy)
+        {
+            _manager->setProxy(listOfProxies.at(0));
+
+            qDebug() << "Using Proxy " << listOfProxies.at(0).hostName();
+        }
+    }
+    //-----------------------------------------------------------------
+
+    request.setRawHeader("User-Agent", _userAgent);
     QNetworkReply * toRet = _manager->get(request);
     return toRet;
 }
