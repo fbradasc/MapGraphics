@@ -68,6 +68,7 @@ void CompositeTileSourceConfigurationWidget::handleCompositeChange()
     this->ui->opacitySlider->setValue(opacityFloat*100);
 }
 
+#if 0
 //private slot
 void CompositeTileSourceConfigurationWidget::addOSMTileLayer()
 {
@@ -75,7 +76,7 @@ void CompositeTileSourceConfigurationWidget::addOSMTileLayer()
     if (composite.isNull())
         return;
 
-    QSharedPointer<OSMTileSource> source(new OSMTileSource(OSMTileSource::OSMTiles));
+    QSharedPointer<OSMTileSource> source(new OSMTileSource(OSMTileSource::MapOSMTiles));
     composite->addSourceTop(source);
 }
 
@@ -100,6 +101,18 @@ void CompositeTileSourceConfigurationWidget::addMapQuestSatLayer()
     QSharedPointer<OSMTileSource> source(new OSMTileSource(OSMTileSource::MapQuestAerialTiles));
     composite->addSourceTop(source);
 }
+#else
+//private slot
+void CompositeTileSourceConfigurationWidget::addOSMTileLayer(const QString &name, const QString &url)
+{
+    QSharedPointer<CompositeTileSource> composite = _composite.toStrongRef();
+    if (composite.isNull())
+        return;
+
+    QSharedPointer<OSMTileSource> source(new OSMTileSource(name, url));
+    composite->addSourceTop(source);
+}
+#endif
 
 //private slot
 void CompositeTileSourceConfigurationWidget::on_removeSourceButton_clicked()
@@ -203,10 +216,12 @@ void CompositeTileSourceConfigurationWidget::init()
             SLOT(handleCurrentSelectionChanged(QModelIndex,QModelIndex)));
 
 
+#if 0
     //Build a menu of possible sources for the "add" button
     QMenu * menu = new QMenu(this->ui->addSourceButton);
     menu->addAction("OpenStreetMap Tiles", this, SLOT(addOSMTileLayer()));
     menu->addAction("MapQuest-OSM Tiles", this, SLOT(addMapQuestLayer()));
     menu->addAction("MapQuest Open Aerial Tiles", this, SLOT(addMapQuestSatLayer()));
     this->ui->addSourceButton->setMenu(menu);
+#endif
 }

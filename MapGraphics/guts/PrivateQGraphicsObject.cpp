@@ -99,6 +99,7 @@ bool PrivateQGraphicsObject::contains(const QPointF &point) const
 //pure-virtual from QGraphicsItem
 void PrivateQGraphicsObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+qDebug() << __FILE__ << ":" << __PRETTY_FUNCTION__ << ":" << __LINE__;
     if (_mgObj.isNull())
     {
         qWarning() << this << "could not paint as our MapGraphicsObject is null";

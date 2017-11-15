@@ -40,6 +40,7 @@ void MapTileGraphicsObject::paint(QPainter *painter, const QStyleOptionGraphicsI
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
+qDebug() << __FILE__ << ":" << __PRETTY_FUNCTION__ << ":" << __LINE__;
     //If we've got a tile, draw it. Otherwise, show a loading or "No tile source" message
     if (_tile != 0)
         painter->drawPixmap(this->boundingRect().toRect(),

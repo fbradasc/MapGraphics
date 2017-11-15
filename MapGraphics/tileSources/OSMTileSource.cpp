@@ -12,8 +12,8 @@ const qreal PI = 3.14159265358979323846;
 const qreal deg2rad = PI / 180.0;
 const qreal rad2deg = 180.0 / PI;
 
-OSMTileSource::OSMTileSource(OSMTileType tileType) :
-    MapTileSource(), _tileType(tileType)
+OSMTileSource::OSMTileSource(QString name, QString queryUrl) :
+    MapTileSource(), _name(name), _url(queryUrl)
 {
     this->setCacheMode(MapTileSource::DiskAndMemCaching);
 }
@@ -67,48 +67,12 @@ quint8 OSMTileSource::maxZoomLevel(QPointF ll)
 
 QString OSMTileSource::name() const
 {
-    switch(_tileType)
-    {
-    case OSMTiles:
-        return "OpenStreetMap Tiles";
-        break;
-
-    case MapQuestOSMTiles:
-        return "MapQuestOSM Tiles";
-        break;
-
-    case MapQuestAerialTiles:
-        return "MapQuest Aerial Tiles";
-        break;
-
-    case TopoMapOSMTiles:
-        return "OpenTopoMap Tiles";
-        break;
-
-    default:
-        return "Unknown Tiles";
-        break;
-    }
+    return _name.isEmpty() ? "Unknown Tiles" : _name;
 }
 
 QString OSMTileSource::tileFileExtension() const
 {
-    if (_tileType == OSMTiles || _tileType == MapQuestOSMTiles || _tileType == TopoMapOSMTiles)
-        return "png";
-    else
-        return "jpg";
-}
-
-#define FIT_URL(url, scheme, host, path, query) \
-{ \
-    url.setScheme(scheme); \
-    url.setHost  ( host ); \
-    url.setPath  ( path ); \
-    \
-    if (!query.empty()) \
-    { \
-        url.setQueryItems(query); \
-    } \
+    return _url.getExt();
 }
 
 //protected
@@ -118,60 +82,7 @@ void OSMTileSource::fetchTile(quint32 x, quint32 y, quint8 z)
 
     QUrl url;
 
-    //Figure out which server to request from based on our desired tile type
-    if (_tileType == OSMTiles)
-    {
-        url.setScheme("http");
-        url.setHost("tile.openstreetmap.org");
-        url.setPath(QString("/%1/%2/%3.png").arg(QString::number(z),QString::number(x),QString::number(y)));
-    }
-    else if (_tileType == TopoMapOSMTiles)
-    {
-        QString host   = QString("a.tile.thunderforest.com");
-        QString scheme = QString("https");
-        QString file   = QString("%1/%2/%3.png").arg(QString::number(z),QString::number(x),QString::number(y));
-        typedef QPair<QString, QString> QueryItem_t;
-        typedef QList<QueryItem_t> Query_t;
-
-        const QueryItem_t apikey("apikey", "def4ddae13e44bd79882ccc24cf486d9");
-
-        Query_t query;
-
-        query.append(apikey);
-
-        // FIT_URL(url, scheme, host, "/cycle/"          + file, query); // OpenCycleMap
-        // FIT_URL(url, scheme, host, "/transport/"      + file, query); // Transport
-        // FIT_URL(url, scheme, host, "/landscape/"      + file, query); // Landscape
-        // FIT_URL(url, scheme, host, "/outdoors/"       + file, query); // Outdoors
-        // FIT_URL(url, scheme, host, "/transport-dark/" + file, query); // Transport Dark
-        // FIT_URL(url, scheme, host, "/spinal-map/"     + file, query); // Spinal Map
-        // FIT_URL(url, scheme, host, "/pioneer/"        + file, query); // Pioneer
-        // FIT_URL(url, scheme, host, "/mobile-atlas/"   + file, query); // Mobile Atlas
-        // FIT_URL(url, scheme, host, "/neighbourhood/"  + file, query); // Neighbourhood
-
-        query.clear();
-        FIT_URL(url, "https", "a.tile.opentopomap.org", "/" + file, query);        // OpenTopoMap
-
-//         url.setScheme("http");
-//         url.setHost("tile.opentopomap.org");
-//         url.setPath(QString("/%1/%2/%3.png").arg(QString::number(z),QString::number(x),QString::number(y)));
-    }
-    else if (_tileType == MapQuestOSMTiles)
-    {
-return;
-        url.setScheme("http");
-        url.setHost("otile1.mqcdn.com");
-        url.setPath(QString("/tiles/1.0.0/osm/%1/%2/%3.jpg").arg(QString::number(z),QString::number(x),QString::number(y)));
-    }
-    else
-    {
-return;
-        url.setScheme("http");
-        url.setHost("otile1.mqcdn.com");
-        url.setPath(QString("/tiles/1.0.0/sat/%1/%2/%3.jpg").arg(QString::number(z),QString::number(x),QString::number(y)));
-    }
-
-    // url.setPort(80);
+    url = _url.toQUrl(x,y,z);
 
     //Use the unique cacheID to see if this tile has already been requested
     const QString cacheID = this->createCacheID(x,y,z);
@@ -268,4 +179,56 @@ void OSMTileSource::handleNetworkRequestFinished()
 
     //Notify client of tile retrieval
     this->prepareNewlyReceivedTile(x,y,z, image, expireTime);
+}
+
+OSMTileSource::OSMUrl::OSMUrl(QString url)
+{
+    _query.clear();
+
+    url.replace(QString("{z}")       ,QString("%1"));
+    url.replace(QString("{x}")       ,QString("%2"));
+    url.replace(QString("{y}")       ,QString("%3"));
+    url.replace(QRegExp("{[a-z-]+}."),QString( "" ));
+
+    _scheme = url.section("://",0,0); url = url.section("://",1,-1);
+    _host   = url.section("/"  ,0,0); url = url.section("/"  ,1,-1);
+    _path   = url.section("?"  ,0,0); url = url.section("?"  ,1,-1);
+
+    _ext    = _path.section(".",-1,-1);
+
+    if (!url.isEmpty())
+    {
+        QStringList queries = url.split("&");
+
+        for (int i=0; i<queries.size(); i++)
+        {
+            if (!queries[i].isEmpty())
+            {
+                const QueryItem_t item
+                (
+                    queries[i].section(QString("="),0,0),
+                    queries[i].section(QString("="),1,1)
+                );
+                _query.append(item);
+            }
+        }
+    }
+}
+
+const QUrl OSMTileSource::OSMUrl::toQUrl(quint32 x, quint32 y, quint8 z) const
+{
+    QUrl url;
+
+    url.setScheme(_scheme);
+    url.setHost  (_host);
+    url.setPath  (QString(_path).arg(QString::number(z),QString::number(x),QString::number(y)));
+
+    if (!_query.empty())
+    {
+        url.setQueryItems(_query);
+    }
+
+qDebug() << url;
+
+    return url;
 }

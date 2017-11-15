@@ -14,7 +14,7 @@ project_name = 'MapGraphics'
 folder_filter_mode = include -- { include, exclude }
 folder_filter +=
 file_filter +=
-file_ignore_pattern += *.o,*.so.*,*.so
+file_ignore_pattern += *.o,*.so.*,*.so,moc_*,ui_*,qrc_resources*
 
 -- Editing:
 indent = 4

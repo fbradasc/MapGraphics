@@ -5,6 +5,8 @@
 #include <QtDebug>
 #include <QRegExp>
 #include <QTimer>
+#include <QList>
+#include <QNetworkProxy>
 
 #include "guts/Conversions.h"
 
@@ -16,6 +18,7 @@ WeatherManager::WeatherManager(MapGraphicsScene *scene, QObject *parent) :
     QObject(parent), _scene(scene)
 {
     _network = new QNetworkAccessManager(this);
+
     connect(_network,
             SIGNAL(finished(QNetworkReply*)),
             this,
@@ -41,6 +44,22 @@ void WeatherManager::doWeatherUpdate()
     qDebug() << "Update!";
     //Get the list of radar images
     QNetworkRequest indexRequest(SHORT_RANGE_REFLECTIVITY_DIR);
+
+    //-----------------------------------------------------------------
+    QNetworkProxyQuery npq(indexRequest.url());
+    QList<QNetworkProxy> listOfProxies = QNetworkProxyFactory::systemProxyForQuery(npq);
+
+    if (listOfProxies.count() != 0)
+    {
+        if (listOfProxies.at(0).type() != QNetworkProxy::NoProxy)
+        {
+            _network->setProxy(listOfProxies.at(0));
+
+            qDebug() << "Using Proxy " << listOfProxies.at(0).hostName();
+        }
+    }
+    //-----------------------------------------------------------------
+
     QNetworkReply * reply = _network->get(indexRequest);
     _expectingIndex.insert(reply);
 

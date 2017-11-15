@@ -23,7 +23,7 @@ MapGraphicsView::MapGraphicsView(MapGraphicsScene *scene, QWidget *parent) :
     _zoomLevel = 2;
 
     //The default drag mode allows us to drag the map around to move the view
-    this->setDragMode(MapGraphicsView::ScrollHandDrag);
+    this->setDragMode(MapGraphicsView::NoDrag /* MapGraphicsView::ScrollHandDrag */);
 
     //Start the timer that will cause the tiles to periodically move to follow the view
     QTimer * renderTimer = new QTimer(this);
@@ -347,7 +347,7 @@ void MapGraphicsView::handleChildViewScrollWheel(QWheelEvent *event)
 {
     event->setAccepted(true);
 
-    this->setDragMode(MapGraphicsView::ScrollHandDrag);
+    this->setDragMode(MapGraphicsView::NoDrag /* MapGraphicsView::ScrollHandDrag */);
     if (event->delta() > 0)
         this->zoomIn(MouseZoom);
     else

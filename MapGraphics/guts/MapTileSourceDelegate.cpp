@@ -13,6 +13,7 @@ MapTileSourceDelegate::MapTileSourceDelegate(QWeakPointer<CompositeTileSource> c
 //virtual from QStyledItemDelegate
 void MapTileSourceDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+qDebug() << __FILE__ << ":" << __PRETTY_FUNCTION__ << ":" << __LINE__;
     QSharedPointer<CompositeTileSource> strong = _composite.toStrongRef();
     if (strong.isNull())
         return;

@@ -55,6 +55,7 @@ void PolygonObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
+qDebug() << __FILE__ << ":" << __PRETTY_FUNCTION__ << ":" << __LINE__;
     painter->setRenderHint(QPainter::Antialiasing,true);
 
     QPolygonF enuPoly;

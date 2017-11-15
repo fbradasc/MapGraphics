@@ -1,4 +1,5 @@
 #include "WeatherImageObject.h"
+#include <QtDebug>
 
 WeatherImageObject::WeatherImageObject(const QImage &img,
                                        const QRectF &sizeInMeters,
@@ -21,6 +22,7 @@ void WeatherImageObject::paint(QPainter *painter,
 {
     Q_UNUSED(option)
     Q_UNUSED(widget)
+qDebug() << __FILE__ << ":" << __PRETTY_FUNCTION__ << ":" << __LINE__;
     painter->drawImage(this->boundingRect(), _img);
 }
 

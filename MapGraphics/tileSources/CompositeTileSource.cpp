@@ -124,7 +124,7 @@ QString CompositeTileSource::name() const
 
 QString CompositeTileSource::tileFileExtension() const
 {
-    return ".jpg";
+    return "jpg";
 }
 
 void CompositeTileSource::addSourceTop(QSharedPointer<MapTileSource> source, qreal opacity)
