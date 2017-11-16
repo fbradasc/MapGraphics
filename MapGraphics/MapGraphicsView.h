@@ -78,6 +78,8 @@ signals:
 public slots:
 
 protected slots:
+    virtual void handleChildKeyPress(QKeyEvent * event);
+    virtual void handleChildKeyRelease(QKeyEvent * event);
     virtual void handleChildMouseDoubleClick(QMouseEvent * event);
     virtual void handleChildMouseMove(QMouseEvent * event);
     virtual void handleChildMousePress(QMouseEvent * event);

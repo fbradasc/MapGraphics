@@ -196,6 +196,24 @@ OSMTileSource::OSMUrl::OSMUrl(QString url)
 
     _ext    = _path.section(".",-1,-1);
 
+    _port   = -1;
+
+    QString port = _host.section(":",1,1);
+
+    if (!port.isEmpty())
+    {
+        _host = _host.section(":",0,0);
+
+        bool success = true;
+
+        _port = port.toInt(&success);
+
+        if (!success)
+        {
+            _port = -1;
+        }
+    }
+
     if (!url.isEmpty())
     {
         QStringList queries = url.split("&");
@@ -222,6 +240,7 @@ const QUrl OSMTileSource::OSMUrl::toQUrl(quint32 x, quint32 y, quint8 z) const
     url.setScheme(_scheme);
     url.setHost  (_host);
     url.setPath  (QString(_path).arg(QString::number(z),QString::number(x),QString::number(y)));
+    url.setPort  (_port);
 
     if (!_query.empty())
     {

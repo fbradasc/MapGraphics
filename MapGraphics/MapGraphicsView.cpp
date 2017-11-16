@@ -161,6 +161,14 @@ void MapGraphicsView::setScene(MapGraphicsScene * scene)
     //Create a QGraphicsView that handles drawing for us
     PrivateQGraphicsView * childView = new PrivateQGraphicsView(childScene, this);
     connect(childView,
+            SIGNAL(hadKeyPressEvent(QKeyEvent*)),
+            this,
+            SLOT(handleChildKeyPress(QKeyEvent*)));
+    connect(childView,
+            SIGNAL(hadKeyReleaseEvent(QKeyEvent*)),
+            this,
+            SLOT(handleChildKeyRelease(QKeyEvent*)));
+    connect(childView,
             SIGNAL(hadMouseDoubleClickEvent(QMouseEvent*)),
             this,
             SLOT(handleChildMouseDoubleClick(QMouseEvent*)));
@@ -310,6 +318,33 @@ void MapGraphicsView::zoomOut(ZoomMode zMode)
 
     if (this->zoomLevel() > _tileSource->minZoomLevel())
         this->setZoomLevel(this->zoomLevel()-1,zMode);
+}
+
+//protected slot
+void MapGraphicsView::handleChildKeyPress(QKeyEvent *event)
+{
+    bool accepted = true;
+
+    switch (event->key())
+    {
+    case Qt::Key_Plus:
+        this->zoomIn();
+        break;
+    case Qt::Key_Minus:
+        this->zoomOut();
+        break;
+    default:
+        accepted = false;
+        break;
+    }
+
+    event->setAccepted(accepted);
+}
+
+//protected slot
+void MapGraphicsView::handleChildKeyRelease(QKeyEvent *event)
+{
+    event->setAccepted(false);
 }
 
 //protected slot

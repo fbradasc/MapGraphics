@@ -71,6 +71,7 @@ private:
         QString _path;
         QString _ext;
         Query_t _query;
+        int     _port;
     };
 
     QString _name;

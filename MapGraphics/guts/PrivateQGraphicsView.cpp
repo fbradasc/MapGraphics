@@ -24,6 +24,26 @@ PrivateQGraphicsView::~PrivateQGraphicsView()
 
 //protected
 ////virtual from QGraphicsView
+void PrivateQGraphicsView::keyPressEvent(QKeyEvent *event)
+{
+    event->setAccepted(false);
+    this->hadKeyPressEvent(event);
+    if (!event->isAccepted())
+        QGraphicsView::keyPressEvent(event);
+}
+
+//protected
+////virtual from QGraphicsView
+void PrivateQGraphicsView::keyReleaseEvent(QKeyEvent *event)
+{
+    event->setAccepted(false);
+    this->hadKeyReleaseEvent(event);
+    if (!event->isAccepted())
+        QGraphicsView::keyReleaseEvent(event);
+}
+
+//protected
+////virtual from QGraphicsView
 void PrivateQGraphicsView::mouseDoubleClickEvent(QMouseEvent *event)
 {
     event->setAccepted(false);

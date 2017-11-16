@@ -18,6 +18,8 @@
 
 const char *tiles_servers[][2] =
 {
+    { "Local Server"   , "http://127.0.0.1:34197/{z}/{x}/{y}.png"                                                                        },
+/*
     { "OpenStreetMap"  , "http://tile.openstreetmap.org/{z}/{x}/{y}.png"                                                           },
     { "OpenCycleMap"   , "https://a.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=def4ddae13e44bd79882ccc24cf486d9"          },
     { "Transport"      , "https://a.tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=def4ddae13e44bd79882ccc24cf486d9"      },
@@ -31,6 +33,7 @@ const char *tiles_servers[][2] =
     { "OpenTopoMap"    , "https://a.tile.opentopomap.org//{z}/{x}/{y}.png"                                                         },
     { "MapQuest OSM"   , "http://otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.jpg"                                                 },
     { "MapQuest Aerial", "http://otile1.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.jpg"                                                 },
+*/
     { NULL, NULL }
 };
 
@@ -77,8 +80,9 @@ MainWindow::MainWindow(QWidget *parent) :
     this->ui->menuWindow->addAction(this->ui->dockWidget->toggleViewAction());
     this->ui->dockWidget->toggleViewAction()->setText("&Layers");
 
-    view->setZoomLevel(4);
-    view->centerOn(-111.658752, 40.255456);
+    view->setZoomLevel(14);
+    view->centerOn(7.666667, 45.05);
+    // view->centerOn(-111.658752, 40.255456);
 
     WeatherManager * weatherMan = new WeatherManager(scene, this);
     Q_UNUSED(weatherMan)

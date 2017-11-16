@@ -13,6 +13,12 @@ public:
 
 protected:
     //virtual from QGraphicsView
+    virtual void keyPressEvent(QKeyEvent *event);
+
+    //virtual from QGraphicsView
+    virtual void keyReleaseEvent(QKeyEvent *event);
+
+    //virtual from QGraphicsView
     virtual void mouseDoubleClickEvent(QMouseEvent *event);
 
     //virtual from QGraphicsView
@@ -31,6 +37,8 @@ protected:
     virtual void wheelEvent(QWheelEvent *event);
     
 signals:
+    void hadKeyPressEvent(QKeyEvent *event);
+    void hadKeyReleaseEvent(QKeyEvent *event);
     void hadMouseDoubleClickEvent(QMouseEvent* event);
     void hadMouseMoveEvent(QMouseEvent * event);
     void hadMousePressEvent(QMouseEvent * event);
